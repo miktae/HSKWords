@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "HSKWords",
-    "slug": "HSKWords",
+    "slug": "hskwords",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,16 +15,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.miktae.HSKWords"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.miktae.HSKWords"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "546fefec-caa3-4a8a-a87f-5d876a36d952"
+      }
     }
   }
 }
