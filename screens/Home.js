@@ -3,17 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, Button, ScrollView } from 'react-native';
 import Tap from './widgets/Tap';
 import * as hskData from "../assets/hsk.json"
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // console.log(hsk1Data.words[0]);
 
 export default function Home({ navigation }) {
   const [randomNumbers, setRandomNumbers] = useState([]);
-  const [data, setData] = useState([]);
 
   useEffect(() => {
     generateRandomNumbers();  // generate initial set of numbers on mount
-    const intervalId = setInterval(generateRandomNumbers, 24 * 60 * 60 * 1000); // generate new numbers every day
-    return () => clearInterval(intervalId); // clear the interval when the component unmounts
   }, []);
 
   const generateRandomNumbers = () => {
@@ -23,19 +21,12 @@ export default function Home({ navigation }) {
       numbers.push(number);
     }
     setRandomNumbers(numbers);
+
   };
 
   const handlePress = () => {
-    setData(...data,
-      randomNumbers.map((number) => (
-       {
-        "simplified": hskData.words[number]['translation-data'].simplified,
-        "tradional" : hskData.words[number]['translation-data'].traditional,
-        "pinyin" : hskData.words[number]['translation-data'].pinyin,
-        "meaning": hskData.words[number]['translation-data'].english
-      })
-    ))
-    navigation.navigate('Questions', { data })
+    //  console.log(randomNumbers);
+    navigation.navigate('Questions', { randomNumbers })
   }
 
   return (
