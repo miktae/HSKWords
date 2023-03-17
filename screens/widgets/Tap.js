@@ -59,56 +59,56 @@ const Tap = (props) => {
 
                 }, 600)
             )
+        }
     }
-}
 
-React.useEffect(() => {
-    // console.log(setSoundUrl(props.soundUrl));
+    React.useEffect(() => {
+        // console.log(setSoundUrl(props.soundUrl));
 
-    return sound
-        ? () => {
-            console.log('Unloading Sound');
-            sound.unloadAsync();
-        }
-        : undefined;
-}, [sound]);
-
-return (
-    <View style={styles.tap}>
-        <View style={styles.tapSimlified}>
-            {
-                props.tradional != props.simplified ?
-                <Text style={styles.tapSimlifiedText}>simplified: &nbsp; </Text>
-                : null
+        return sound
+            ? () => {
+                console.log('Unloading Sound');
+                sound.unloadAsync();
             }
-            <Text style={styles.tapHanyu}>
-                {props.simplified}
-            </Text>
-        </View>
-        <View>
-        {
-            props.tradional != props.simplified ?
+            : undefined;
+    }, [sound]);
+
+    return (
+        <View style={styles.tap}>
             <View style={styles.tapSimlified}>
-                <Text style={styles.tapSimlifiedText}>
-                    traditional:&nbsp;  
-                </Text>
+                {
+                    props.tradional != props.simplified ?
+                        <Text style={styles.tapSimlifiedText}>simplified: &nbsp; </Text>
+                        : null
+                }
                 <Text style={styles.tapHanyu}>
-                    {props.tradional} 
-                 </Text>
+                    {props.simplified}
+                </Text>
             </View>
-            : null
-        }
+            <View>
+                {
+                    props.tradional != props.simplified ?
+                        <View style={styles.tapSimlified}>
+                            <Text style={styles.tapSimlifiedText}>
+                                traditional:&nbsp;
+                            </Text>
+                            <Text style={styles.tapHanyu}>
+                                {props.tradional}
+                            </Text>
+                        </View>
+                        : null
+                }
+            </View>
+            <TouchableOpacity style={styles.tapPinyin} onPress={() =>
+                playSound()}>
+                <Text style={styles.tapPinyinText} >
+                    {props.pinyin} &nbsp;
+                </Text>
+                <Ionicons name="volume-high" size={24} color="black" />
+            </TouchableOpacity>
+            <Text style={styles.tapMeaning}>{props.meaning}</Text>
         </View>
-        <TouchableOpacity style={styles.tapPinyin} onPress={() =>
-            playSound()}>
-            <Text style={styles.tapPinyinText} >
-                {props.pinyin} &nbsp; 
-            </Text>
-            <Ionicons name="volume-high" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.tapMeaning}>{props.meaning}</Text>
-    </View>
-)
+    )
 }
 
 const styles = StyleSheet.create({
