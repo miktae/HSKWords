@@ -1,18 +1,33 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, Button, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Button, Pressable, ScrollView, Modal, Dimensions } from 'react-native';
 import Tap from './widgets/Tap';
-import * as hskData from "../assets/hsk.json"
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import hskData from "../assets/hsk.json"
+import { useStore } from './store.js'
+const screenDimensions = Dimensions.get('screen');
 
 // console.log(hsk1Data.words[0]);
 
 export default function Home({ navigation }) {
   const [randomNumbers, setRandomNumbers] = useState([]);
+  const [showReminder, setShowReminder] = useState(false);
+  const n = useStore(state => state.n);
+  const removeN = useStore(state => state.removeN);
+  const addWords = useStore(state => state.pushToArray);
 
   useEffect(() => {
     generateRandomNumbers();  // generate initial set of numbers on mount
+    // console.log(n);
+    if (n > 3) {
+      setShowReminder(true)
+      removeN()
+    }
   }, []);
+
+  useEffect(() => {
+    if (randomNumbers)
+      addWords(randomNumbers)
+  }, [randomNumbers]);
 
   const generateRandomNumbers = () => {
     const numbers = [];
@@ -21,7 +36,6 @@ export default function Home({ navigation }) {
       numbers.push(number);
     }
     setRandomNumbers(numbers);
-
   };
 
   const handlePress = () => {
@@ -32,23 +46,39 @@ export default function Home({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}
-       style={styles.scrollView}>
-      <View style={styles.content}>
-        {randomNumbers.map((number, index) => (
-          <Tap simplified={hskData.words[number]['translation-data'].simplified}
-            tradional={hskData.words[number]['translation-data'].traditional}
-            pinyin={hskData.words[number]['translation-data'].pinyin}
-            soundUrl={hskData.words[number]['translation-data']['pinyin-numbered']}
-            meaning={hskData.words[number]['translation-data'].english}
-            key={index} />
-        ))}
-      </View>
-      <View style={styles.buttonContainer}>
-        <Button style={styles.button}
-         title="Questions" 
-         onPress={handlePress}/>
-      </View>
-      <StatusBar style="auto" />
+        style={styles.scrollView}>
+        <Modal visible={showReminder} style={styles.modal}
+          animationType="fade" transparent={true}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>
+              Do you want to test your HSK words now?
+            </Text>
+            <View style={styles.modalBtnContainer}>
+              <Pressable style={styles.btnOpen} onPress={() => { setShowReminder(!showReminder); navigation.navigate('Test') }}>
+                <Text style={styles.text}>OK</Text>
+              </Pressable>
+              <Pressable style={styles.btnClose} onPress={() => setShowReminder(!showReminder)}>
+                <Text style={styles.text}>Close</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+        <View style={styles.content}>
+          {randomNumbers.map((number, index) => (
+            <Tap simplified={hskData.words[number]['translation-data'].simplified}
+              tradional={hskData.words[number]['translation-data'].traditional}
+              pinyin={hskData.words[number]['translation-data'].pinyin}
+              soundUrl={hskData.words[number]['translation-data']['pinyin-numbered']}
+              meaning={hskData.words[number]['translation-data'].english}
+              key={index} />
+          ))}
+        </View>
+        <View style={styles.buttonContainer}>
+          <Button style={styles.button}
+            title="Questions"
+            onPress={handlePress} />
+        </View>
+        <StatusBar style="auto" />
       </ScrollView>
     </SafeAreaView>
   );
@@ -70,9 +100,60 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-evenly',
   },
-  buttonContainer: { 
+  buttonContainer: {
     marginVertical: 30,
     flexDirection: 'row',
     justifyContent: 'center',
+  },
+  modalView: {
+    width: screenDimensions.width / 3,
+    height: screenDimensions.height / 6,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    marginHorizontal: screenDimensions.width / 3,
+    marginVertical: screenDimensions.height / 3,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    fontSize: 21,
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  modalBtnContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 10,
+  },
+  btnOpen: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderRadius: 4,
+    elevation: 3,
+    backgroundColor: 'blue',
+  },
+  btnClose: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderRadius: 4,
+    elevation: 3,
+    backgroundColor: 'black',
+  },
+  text: {
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: 'bold',
+    letterSpacing: 0.25,
+    color: 'white',
   },
 });
