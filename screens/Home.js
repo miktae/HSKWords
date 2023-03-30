@@ -13,12 +13,14 @@ export default function Home({ navigation }) {
   const [showReminder, setShowReminder] = useState(false);
   const n = useStore(state => state.n);
   const removeN = useStore(state => state.removeN);
+  const updateT = useStore(state => state.updateT);
   const addWords = useStore(state => state.pushToArray);
 
   useEffect(() => {
     generateRandomNumbers();  // generate initial set of numbers on mount
     // console.log(n);
-    if (n > 3) {
+    if (n >= 3) {
+      updateT()
       setShowReminder(true)
       removeN()
     }

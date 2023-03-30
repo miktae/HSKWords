@@ -6,6 +6,8 @@ export const useStore = create(
         (set, get) => ({
             wArray: [],
             n: 0,
+            t: 0,
+            updateT: () => set({ t: get().t + 1 }),
             increaseN: () => set({ n: get().n + 1 }),
             upIndex: () => set({ index: get().index + 1 }),
             removeN: () => set({ n: 0 }),
