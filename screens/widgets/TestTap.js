@@ -1,11 +1,14 @@
-import { View, Text, TextInput, StyleSheet, Dimensions, LogBox } from 'react-native'
+import { View, Text, TextInput, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useBearsStore } from '../store.js';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
+import { Pressable } from 'react-native';
 
 export default function TestTap(props) {
     const updateScore = useBearsStore(state => state.updateScore);
     const [text, setText] = useState();
+    const [placeholder, setPlaceholder] = useState('Enter text here')
     const [sound, setSound] = useState();
 
     async function playSound(m_type) {
@@ -89,14 +92,23 @@ export default function TestTap(props) {
         }
     }
 
+    function Assistant(){
+        console.log('Assistant');
+        setPlaceholder(props.pinyin)
+    }
+
     return (
         <View style={styles.testView}>
             <View style={styles.testContent}>
                 <Text style={styles.text}>Q{props.index}. {props.testTitle} in Chinese(simplified) is: </Text>
                 <View>
-                    <TextInput style={styles.input} placeholder="Enter text here"
+                    <TextInput style={styles.input} placeholder={placeholder}
                         onFocus={() => { playPinyinSound() }}
                         onChangeText={(text) => { setText(text) }} />
+                        <Pressable onPress={() => Assistant()}>
+                     <MaterialCommunityIcons name="assistant"
+                      size={24} color="black" />
+                      </Pressable>
                 </View>
             </View>
         </View>

@@ -20,6 +20,10 @@ const Test = () => {
     return randomNumber;
   };
 
+  const FinishTest = () => {
+    console.log("Finish Test");
+  }
+
   useEffect(() => {
     // console.log(wArray);
     // wArray.map((w, i) => console.log(w));
@@ -35,21 +39,22 @@ const Test = () => {
       </View>
       {
         wArray.map((w, i) => (
-          (i + 1 <= 20 * t) && (i + 1 >= 20 * (t-1) + 1) ?
-          <TestTap key={i} index={i + 1} testTitle={
-            hskData.words[w]['translation-data'].english
-          }
-            sound={hskData.words[w]['translation-data']['pinyin-numbered']}
-            correctAnswer={hskData.words[w]['translation-data'].simplified}
-          ></TestTap>
-          : null
+          (i + 1 <= 20 * t) && (i + 1 >= 20 * (t - 1) + 1) ?
+            <TestTap key={i} index={i + 1} testTitle={
+              hskData.words[w]['translation-data'].english
+            }
+              pinyin={hskData.words[w]['translation-data'].pinyin}
+              sound={hskData.words[w]['translation-data']['pinyin-numbered']}
+              correctAnswer={hskData.words[w]['translation-data'].simplified}
+            ></TestTap>
+            : null
         ))
       }
       <View style={styles.buttonContainer}>
-        <Pressable style={styles.button} onPress={() => { }}>
-        <Text style={styles.text}>Submit</Text>
-      </Pressable>
-      </View> 
+        <Pressable style={styles.button} onPress={() => {FinishTest()}}>
+          <Text style={styles.text}>Submit</Text>
+        </Pressable>
+      </View>
     </ScrollView>
   )
 }
