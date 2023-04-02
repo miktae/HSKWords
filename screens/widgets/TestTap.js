@@ -7,34 +7,39 @@ import { Pressable } from 'react-native';
 
 export default function TestTap(props) {
     const updateScore = useBearsStore(state => state.updateScore);
+    const updateQAnswered = useBearsStore(state => state.updateQAnswered);
+    const updateQCorrect = useBearsStore(state => state.updateQCorrect);
+    const isFinish = useBearsStore(state => state.isFinish);
     const [text, setText] = useState();
+    const [answerN, setAnswerN] = useState(0);
     const [placeholder, setPlaceholder] = useState('Enter text here')
     const [sound, setSound] = useState();
 
     async function playSound(m_type) {
         // console.log('Loading Sound');
-    
+
         if (m_type === true) {
-          const { sound } = await Audio.Sound.createAsync(
-            require('../../assets/correct.mp3')
-          );
-          setSound(sound);
-          await sound.playAsync()
+            const { sound } = await Audio.Sound.createAsync(
+                require('../../assets/correct.mp3')
+            );
+            setSound(sound);
+            await sound.playAsync()
         }
         else if (m_type === false) {
-          const { sound } = await Audio.Sound.createAsync(
-           require('../../assets/incorrect.wav')
-          );
-          setSound(sound);
-          await sound.playAsync()
+            const { sound } = await Audio.Sound.createAsync(
+                require('../../assets/incorrect.wav')
+            );
+            setSound(sound);
+            await sound.playAsync()
         }
-      }
+    }
 
     useEffect(() => {
         // console.log(text);
         // console.log(props.correctAnswer);
         if (text == props.correctAnswer) {
-            console.log('correctAnswer');
+            updateQCorrect();
+            //  console.log('correctAnswer');
             updateScore();
             playSound(true);
         }
@@ -92,9 +97,18 @@ export default function TestTap(props) {
         }
     }
 
-    function Assistant(){
-        console.log('Assistant');
+    function Assistant() {
+        // console.log('Assistant');
         setPlaceholder(props.pinyin)
+    }
+
+    function handleBlur() {
+        if (text !== undefined || text !== '') {
+           // console.log(text, props.index);
+            if (answerN == 1) {
+                updateQAnswered()
+            }
+        }
     }
 
     return (
@@ -102,13 +116,29 @@ export default function TestTap(props) {
             <View style={styles.testContent}>
                 <Text style={styles.text}>Q{props.index}. {props.testTitle} in Chinese(simplified) is: </Text>
                 <View>
-                    <TextInput style={styles.input} placeholder={placeholder}
-                        onFocus={() => { playPinyinSound() }}
+                    <TextInput required style={styles.input} placeholder={placeholder}
+                        onFocus={() => { playPinyinSound(); setAnswerN(answerN + 1) }}
+                        onBlur={() => { handleBlur() }}
                         onChangeText={(text) => { setText(text) }} />
-                        <Pressable onPress={() => Assistant()}>
-                     <MaterialCommunityIcons name="assistant"
-                      size={24} color="black" />
-                      </Pressable>
+                    {
+                        isFinish ?
+                            text == props.correctAnswer
+                                ? <Text>Correct</Text>
+                                :(
+                                <View>
+                                <Text>Wrong, right answer is: 
+                                  <Text style={{ marginLeft: 7, fontSize: 21}}>
+                                    {props.correctAnswer}
+                                  </Text>
+                                  <Text>[{props.pinyin}]</Text>
+                                </Text>
+                                </View>)
+                            : null
+                    }
+                    <Pressable onPress={() => Assistant()}>
+                        <MaterialCommunityIcons name="assistant"
+                            size={24} color="black" />
+                    </Pressable>
                 </View>
             </View>
         </View>
