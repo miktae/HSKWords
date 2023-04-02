@@ -48,3 +48,8 @@ export const useBearsStore = create(
         }
     )
 )
+
+export const useRefresh = create((set) => ({
+    refresh: false,
+    setRefresh: (par) => set({ refresh: par }),
+}))

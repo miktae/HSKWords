@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, Button, Pressable, ScrollView, Modal, Dimensions } from 'react-native';
 import Tap from './widgets/Tap';
 import hskData from "../assets/hsk.json"
-import { useStore } from './store.js'
+import { useStore, useRefresh } from './store.js'
 const screenDimensions = Dimensions.get('screen');
 
 // console.log(hsk1Data.words[0]);
@@ -13,6 +13,7 @@ export default function Home({ navigation }) {
   const [showReminder, setShowReminder] = useState(false);
   const n = useStore(state => state.n);
   const removeN = useStore(state => state.removeN);
+  const refresh = useRefresh(state => state.refresh);
   const updateT = useStore(state => state.updateT);
   const addWords = useStore(state => state.pushToArray);
 
@@ -30,6 +31,11 @@ export default function Home({ navigation }) {
     if (randomNumbers)
       addWords(randomNumbers)
   }, [randomNumbers]);
+
+  useEffect(() => {
+   // console.log(refresh);
+    generateRandomNumbers(); 
+  }, [refresh]);
 
   const generateRandomNumbers = () => {
     const numbers = [];
