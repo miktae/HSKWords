@@ -7,10 +7,12 @@ export const useStore = create(
             wArray: [],
             n: 0,
             t: 0,
+            index: null,
             updateT: () => set({ t: get().t + 1 }),
             increaseN: () => set({ n: get().n + 1 }),
             upIndex: () => set({ index: get().index + 1 }),
             removeN: () => set({ n: 0 }),
+            setIndex: (i) => set({ index: i }),
             pushToArray: (r) => {
                 if (r && r[0]) {
                     set((state) => ({ wArray: [...state.wArray, r[0], r[1], r[2], r[3], r[4]] }))

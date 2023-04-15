@@ -16,6 +16,7 @@ export default function Home({ navigation }) {
   const refresh = useRefresh(state => state.refresh);
   const updateT = useStore(state => state.updateT);
   const addWords = useStore(state => state.pushToArray);
+  const index = useStore(state => state.index);
 
   useEffect(() => {
     generateRandomNumbers();  // generate initial set of numbers on mount
@@ -79,7 +80,8 @@ export default function Home({ navigation }) {
               soundUrl={hskData.words[number]['translation-data']['pinyin-numbered']}
               meaning={hskData.words[number]['translation-data'].english}
               key={index} />
-          ))}
+          ))
+          }
         </View>
         <View style={styles.buttonContainer}>
           <Button style={styles.button}

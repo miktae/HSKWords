@@ -1,10 +1,17 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native'
 import React from 'react'
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
+import { useStore } from '../store.js';
+import hanzi from 'hanzi';
 
 const Tap = (props) => {
+    const setIndex = useStore(state => state.setIndex);
+    const [textHanyuDetail, setTextHanyuDetail] = React.useState(null)
+    const [textStyleIndex, setTextStyleIndex] = React.useState(null)
+    const [textStyleIndex1, setTextStyleIndex1] = React.useState(null)
     const [sound, setSound] = React.useState();
+    const [pinyinSound, setPinyinSound] = React.useState();
 
     function setSoundUrl(url) {
         const soundUrlArr = [];
@@ -25,7 +32,7 @@ const Tap = (props) => {
 
     async function playSound() {
 
-        console.log(setSoundUrl(props.soundUrl)[0]);
+        // console.log(setSoundUrl(props.soundUrl)[0]);
         // console.log('Loading Sound');
 
         if (setSoundUrl(props.soundUrl)[1] == '') {
@@ -62,56 +69,177 @@ const Tap = (props) => {
         }
     }
 
+    async function playPinyinSound(pinyin) {
+        const hasUppercase = /[A-Z]/.test(pinyin);
+        if (!hasUppercase) {
+            const { sound } = await Audio.Sound.createAsync({
+                uri: "https://cdn.yoyochinese.com/audio/pychart/"
+                    + pinyin + ".mp3"
+            });
+            // console.log("https://cdn.yoyochinese.com/audio/pychart/"
+            //     + pinyin + ".mp3");
+            setSound(sound)
+            //   console.log('Playing Sound');
+            if ("https://cdn.yoyochinese.com/audio/pychart/"
+                + pinyin + ".mp3") {
+                await sound.playAsync();
+            }
+        }
+    }
+
+    React.useEffect(() => {
+        hanzi.start();
+    }, [])
+
     React.useEffect(() => {
         // console.log(setSoundUrl(props.soundUrl));
 
         return sound
             ? () => {
-                console.log('Unloading Sound');
+                // console.log('Unloading Sound');
                 sound.unloadAsync();
             }
             : undefined;
     }, [sound]);
 
+    React.useEffect(() => {
+        // // console.log(typeof(props.simplified));
+        // if (props.simplified) {
+        //     console.log(props.simplified.length);
+        // }
+    }, [0])
+
     return (
-        <View style={styles.tap}>
-            <View style={styles.tapSimlified}>
-                {
-                    props.tradional != props.simplified ?
-                        <Text style={styles.tapSimlifiedText}>simplified: &nbsp; </Text>
-                        : null
-                }
-                <Text style={styles.tapHanyu}>
-                    {props.simplified}
-                </Text>
+        <View style={styles.container}>
+            <View style={styles.tap}>
+                <View style={styles.tapSimlified}>
+                    {
+                        props.tradional != props.simplified ?
+                            <Text style={styles.tapSimlifiedText}>simplified: &nbsp; </Text>
+                            : null
+                    }
+                    <Text style={styles.tapHanyu}>
+                        {Array.from({ length: props.simplified.length }, (_, i) => (
+                            <View key={i} style={styles.tapRow}>
+                                <Pressable onPress={() => {
+                                    setTextStyleIndex(i)
+                                    setTextHanyuDetail(props.simplified[i])
+                                }}
+                                >
+                                    <Text style={[
+                                        styles.tapHanyu,
+                                        (textStyleIndex === i) ?
+                                            styles.tapHanyuHover : null
+                                    ]}>
+                                        {props.simplified[i]}
+                                    </Text></Pressable>
+                            </View>
+                        ))}
+                    </Text>
+                </View>
+                <View>
+                    {
+                        props.tradional != props.simplified ?
+                            <View style={styles.tapSimlified}>
+                                <Text style={styles.tapSimlifiedText}>
+                                    traditional:&nbsp;
+                                </Text>
+                                <Text style={styles.tapHanyu}>
+                                    {Array.from({ length: props.tradional.length }, (_, j) => (
+                                        <Text key={j} style={[
+                                            styles.tapHanyu,
+                                            textStyleIndex1 == j ? styles.tapHanyuHover : null
+                                        ]} onMouseEnter={() => {
+                                            setTextStyleIndex1(j)
+                                        }}
+                                            onMouseLeave={() => {
+                                                setTextStyleIndex1(null)
+                                            }}>
+                                            {props.tradional[j]}
+                                        </Text>
+                                    ))}
+                                </Text>
+                            </View>
+                            : null
+                    }
+                </View>
+                <TouchableOpacity style={styles.tapPinyin}
+                    onMouseEnter={() => {
+                        playSound()
+                    }}
+                    onPress={() =>
+                        playSound()
+                    }
+                >
+                    <Text style={styles.tapPinyinText} >
+                        {props.pinyin} &nbsp;
+                        <Ionicons name="volume-high" size={23} color="black" />
+                    </Text>
+                </TouchableOpacity>
+                <Text style={styles.tapMeaning}>{props.meaning}</Text>
             </View>
-            <View>
-                {
-                    props.tradional != props.simplified ?
-                        <View style={styles.tapSimlified}>
-                            <Text style={styles.tapSimlifiedText}>
-                                traditional:&nbsp;
-                            </Text>
-                            <Text style={styles.tapHanyu}>
-                                {props.tradional}
-                            </Text>
-                        </View>
-                        : null
-                }
-            </View>
-            <TouchableOpacity style={styles.tapPinyin} onPress={() =>
-                playSound()}>
-                <Text style={styles.tapPinyinText} >
-                    {props.pinyin} &nbsp;
-                </Text>
-                <Ionicons name="volume-high" size={24} color="black" />
-            </TouchableOpacity>
-            <Text style={styles.tapMeaning}>{props.meaning}</Text>
+            {
+                textStyleIndex != null ? <View style={styles.tapHanyuDetailView}>
+                    <TouchableOpacity style={styles.closeButton}
+                        onPress={() => { setTextStyleIndex(null) }}>
+                        <FontAwesome name="times" size={23} color="black" />
+                    </TouchableOpacity>
+                    <Text style={styles.tapHanyuDetailText}>
+                        {textHanyuDetail}
+                    </Text>
+                    <View style={styles.tapPinyinText} >
+                        {
+                            hanzi.getPinyin(textHanyuDetail)[0] == hanzi.getPinyin(textHanyuDetail)[1]
+                                ?
+                                <Pressable onPress={() => {
+                                    playPinyinSound(hanzi.getPinyin(textHanyuDetail)[0])
+                                }}
+                                    style={[styles.tapRow, { justifyContent: 'center' }]}>
+                                    <Text>{hanzi.getPinyin(textHanyuDetail)[0]}</Text>
+                                    <Ionicons name="volume-high" size={23} color="black" />
+                                </Pressable>
+                                :
+                                <View>
+                                    <Pressable onPress={() => {
+                                        playPinyinSound(hanzi.getPinyin(textHanyuDetail)[0])
+                                    }}
+                                        style={[styles.tapRow, { justifyContent: 'center' }]}>
+                                        <Text>
+                                            {hanzi.getPinyin(textHanyuDetail)[0]}
+                                        </Text>
+                                        <Ionicons name="volume-high" size={23} color="black" />
+                                    </Pressable>
+                                    <Pressable onPress={() => {
+                                        playPinyinSound(hanzi.getPinyin(textHanyuDetail)[1])
+                                    }}
+                                        style={[styles.tapRow, { justifyContent: 'center' }]}><Text>
+                                            {hanzi.getPinyin(textHanyuDetail)[1]}
+                                        </Text>
+                                        <Ionicons name="volume-high" size={23} color="black" />
+                                    </Pressable>
+                                </View>
+                        }
+                    </View>
+                    <View style={styles.triangle} />
+                    <Text style={styles.tapPinyinText} >
+                        {hanzi.definitionLookup(
+                            textHanyuDetail).map((w, i) => i == 0 &&
+                                <Text key={i}>
+                                    {w.definition.split('/').slice(0, 1).join('/')}
+                                </Text>)}
+                        &nbsp;
+                    </Text>
+                </View> : null
+            }
         </View>
     )
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     tap: {
         backgroundColor: '#fafafa',
         margin: 9,
@@ -120,8 +248,21 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         borderRadius: 6,
     },
+    tapRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     tapHanyu: {
         fontSize: 26,
+        cursor: 'default',
+        marginLeft: 3,
+    },
+    tapHanyuHover: {
+        fontSize: 26,
+        cursor: 'default',
+        marginLeft: 3,
+        backgroundColor: 'blue',
+        color: 'white',
     },
     tapSimlified: {
         display: 'flex',
@@ -140,7 +281,42 @@ const styles = StyleSheet.create({
     },
     tapPinyinText: {
         textAlign: 'center',
-    }
+    },
+    tapHanyuDetailView: {
+        marginLeft: 10,
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        zIndex: -1,
+    },
+    tapHanyuDetailText: {
+        textAlign: 'center',
+        fontSize: 23
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        zIndex: 1,
+        backgroundColor: 'transperant',
+        width: 30,
+        height: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    triangle: {
+        width: 0,
+        height: 0,
+        backgroundColor: 'transparent',
+        borderStyle: 'solid',
+        borderTopWidth: 20,
+        borderRightWidth: 20,
+        borderTopColor: 'transparent',
+        borderRightColor: '#fff',
+        position: 'absolute',
+        top: 10,
+        left: -19,
+    },
 });
 
 export default Tap
