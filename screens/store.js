@@ -55,3 +55,8 @@ export const useRefresh = create((set) => ({
     refresh: false,
     setRefresh: (par) => set({ refresh: par }),
 }))
+
+export const toggleDarkMode = create((set) => ({
+    isDarkMode: false,
+    setDarkMode: (par) => set({ isDarkMode: par }),
+}))

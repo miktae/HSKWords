@@ -103,6 +103,8 @@ const Tap = (props) => {
     }, [sound]);
 
     React.useEffect(() => {
+        // if (textHanyuDetail)
+        //     console.log(hanzi.definitionLookup(textHanyuDetail).map((w, i) => w.definition));
         // // console.log(typeof(props.simplified));
         // if (props.simplified) {
         //     console.log(props.simplified.length);
@@ -154,7 +156,8 @@ const Tap = (props) => {
                                         }}
                                             onMouseLeave={() => {
                                                 setTextStyleIndex1(null)
-                                            }}>
+                                            }}
+                                        >
                                             {props.tradional[j]}
                                         </Text>
                                     ))}
@@ -179,57 +182,62 @@ const Tap = (props) => {
                 <Text style={styles.tapMeaning}>{props.meaning}</Text>
             </View>
             {
-                textStyleIndex != null ? <View style={styles.tapHanyuDetailView}>
-                    <TouchableOpacity style={styles.closeButton}
-                        onPress={() => { setTextStyleIndex(null) }}>
-                        <FontAwesome name="times" size={23} color="black" />
-                    </TouchableOpacity>
-                    <Text style={styles.tapHanyuDetailText}>
-                        {textHanyuDetail}
-                    </Text>
-                    <View style={styles.tapPinyinText} >
-                        {
-                            hanzi.getPinyin(textHanyuDetail)[0] == hanzi.getPinyin(textHanyuDetail)[1]
-                                ?
-                                <Pressable onPress={() => {
-                                    playPinyinSound(hanzi.getPinyin(textHanyuDetail)[0])
-                                }}
-                                    style={[styles.tapRow, { justifyContent: 'center' }]}>
-                                    <Text>{hanzi.getPinyin(textHanyuDetail)[0]}</Text>
-                                    <Ionicons name="volume-high" size={23} color="black" />
-                                </Pressable>
-                                :
-                                <View>
+                (textStyleIndex != null)
+                    ? <View style={styles.tapHanyuDetailView}>
+                        <TouchableOpacity style={styles.closeButton}
+                            onPress={() => { setTextStyleIndex(null) }}>
+                            <FontAwesome name="times" size={23} color="black" />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => { setTextStyleIndex(null) }}>
+                            <Text style={styles.tapHanyuDetailText}>
+                                {textHanyuDetail}
+                            </Text>
+                        </TouchableOpacity>
+                        <View style={styles.tapPinyinText} >
+                            {
+                                hanzi.getPinyin(textHanyuDetail)[0] == hanzi.getPinyin(textHanyuDetail)[1]
+                                    ?
                                     <Pressable onPress={() => {
                                         playPinyinSound(hanzi.getPinyin(textHanyuDetail)[0])
                                     }}
                                         style={[styles.tapRow, { justifyContent: 'center' }]}>
-                                        <Text>
-                                            {hanzi.getPinyin(textHanyuDetail)[0]}
-                                        </Text>
+                                        <Text>{hanzi.getPinyin(textHanyuDetail)[0]}</Text>
                                         <Ionicons name="volume-high" size={23} color="black" />
                                     </Pressable>
-                                    <Pressable onPress={() => {
-                                        playPinyinSound(hanzi.getPinyin(textHanyuDetail)[1])
-                                    }}
-                                        style={[styles.tapRow, { justifyContent: 'center' }]}><Text>
-                                            {hanzi.getPinyin(textHanyuDetail)[1]}
-                                        </Text>
-                                        <Ionicons name="volume-high" size={23} color="black" />
-                                    </Pressable>
-                                </View>
-                        }
-                    </View>
-                    <View style={styles.triangle} />
-                    <Text style={styles.tapPinyinText} >
-                        {hanzi.definitionLookup(
-                            textHanyuDetail).map((w, i) => i == 0 &&
-                                <Text key={i}>
-                                    {w.definition.split('/').slice(0, 1).join('/')}
-                                </Text>)}
-                        &nbsp;
-                    </Text>
-                </View> : null
+                                    :
+                                    <View>
+                                        {
+                                            hanzi.getPinyin(textHanyuDetail)[0].charAt(0)
+                                                != hanzi.getPinyin(textHanyuDetail)[0].charAt(0).toUpperCase()
+                                                ?
+                                                <Pressable onPress={() => {
+                                                    playPinyinSound(hanzi.getPinyin(textHanyuDetail)[0])
+                                                }}
+                                                    style={[styles.tapRow, { justifyContent: 'center' }]}><Text>{hanzi.getPinyin(textHanyuDetail)[0]}</Text>
+                                                    <Ionicons name="volume-high" size={23} color="black" />
+                                                </Pressable> : null
+                                        }
+                                        <Pressable onPress={() => {
+                                            playPinyinSound(hanzi.getPinyin(textHanyuDetail)[1])
+                                        }}
+                                            style={[styles.tapRow, { justifyContent: 'center' }]}><Text>
+                                                {hanzi.getPinyin(textHanyuDetail)[1]}
+                                            </Text>
+                                            <Ionicons name="volume-high" size={23} color="black" />
+                                        </Pressable>
+                                    </View>
+                            }
+                        </View>
+                        <View style={styles.triangle} />
+                        <Text style={styles.tapPinyinText}>
+                            {textHanyuDetail && hanzi.definitionLookup(textHanyuDetail).map((w, i) => {
+                                return (i == 0 ? <Text key={i}>
+                                    {w.definition.split('/').slice(0, 3).join('/')}
+                                </Text> : null)
+                            })}
+                        </Text>
+                    </View> : null
             }
         </View>
     )
@@ -281,6 +289,7 @@ const styles = StyleSheet.create({
     },
     tapPinyinText: {
         textAlign: 'center',
+        color: '#000'
     },
     tapHanyuDetailView: {
         marginLeft: 10,

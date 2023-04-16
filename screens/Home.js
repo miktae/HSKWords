@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, Button, Pressable, ScrollView, Modal, Dimensions } from 'react-native';
 import Tap from './widgets/Tap';
 import hskData from "../assets/hsk.json"
-import { useStore, useRefresh } from './store.js'
+import { useStore, useRefresh, toggleDarkMode } from './store.js'
 const screenDimensions = Dimensions.get('screen');
 
 // console.log(hsk1Data.words[0]);
@@ -17,6 +17,7 @@ export default function Home({ navigation }) {
   const updateT = useStore(state => state.updateT);
   const addWords = useStore(state => state.pushToArray);
   const index = useStore(state => state.index);
+  const isDarkMode = toggleDarkMode(state => state.isDarkMode);
 
   useEffect(() => {
     generateRandomNumbers();  // generate initial set of numbers on mount
@@ -52,8 +53,11 @@ export default function Home({ navigation }) {
     navigation.navigate('Questions', { randomNumbers })
   }
 
+  const backgroundColor = isDarkMode ? '#121212' : '#f0f2f5';
+  const color = isDarkMode ? '#fff' : '#000';
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor, color }]}>
       <ScrollView showsVerticalScrollIndicator={false}
         style={styles.scrollView}>
         <Modal visible={showReminder} style={styles.modal}
@@ -99,7 +103,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
-    backgroundColor: '#f0f2f5',
   },
   scrollView: {
     marginHorizontal: 0,
