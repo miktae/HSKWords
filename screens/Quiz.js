@@ -9,8 +9,8 @@ const screenDimensions = Dimensions.get('screen');
 
 const Quiz = () => {
   const route = useRoute();
-  const increaseN = useStore(state=> state.increaseN);
-  const n = useStore(state=> state.n);
+  const increaseN = useStore(state => state.increaseN);
+  const n = useStore(state => state.n);
   const { randomNumbers } = route.params;
   // const randomNumbers = [2, 1, 3, 6, 9];
 
@@ -29,6 +29,7 @@ const Quiz = () => {
     });
     setQuestions({
       question: word.simplified,
+      pinyin: word.pinyin,
       answers,
       correctAnswer: word.english,
     });
@@ -65,14 +66,14 @@ const Quiz = () => {
   }
 
   useEffect(() => {
-     // console.log(screenDimensions);
+    // console.log(screenDimensions);
     fetchData(index);
     increaseN()
   }, []);
 
   useEffect(() => {
     console.log(n);
-   playPinyinSound()
+    playPinyinSound()
   }, [index]);
 
   function setSoundUrl(url) {
@@ -80,51 +81,51 @@ const Quiz = () => {
     const match = url.match(/^([a-zA-Z]+)(\d.*)/);
 
     if (match) {
-        const firstPart = match[1] + match[2].match(/^\d+/)[0];
-        const secondPart = match[2].replace(/^\d+/, '');
-        soundUrlArr.push(firstPart);
-        soundUrlArr.push(secondPart);
+      const firstPart = match[1] + match[2].match(/^\d+/)[0];
+      const secondPart = match[2].replace(/^\d+/, '');
+      soundUrlArr.push(firstPart);
+      soundUrlArr.push(secondPart);
 
-        //   console.log(firstPart, secondPart);
+      //   console.log(firstPart, secondPart);
     } else {
-        console.log('Invalid string');
+      console.log('Invalid string');
     }
     return soundUrlArr;
-   }
+  }
 
   const playPinyinSound = async () => {
     if (setSoundUrl(hskData.words[randomNumbers[index]]['translation-data']['pinyin-numbered'])[1] == '') {
       const { sound } = await Audio.Sound.createAsync({
-          uri: "https://cdn.yoyochinese.com/audio/pychart/"
-              + hskData.words[randomNumbers[index]]['translation-data']['pinyin-numbered'] + ".mp3"
+        uri: "https://cdn.yoyochinese.com/audio/pychart/"
+          + hskData.words[randomNumbers[index]]['translation-data']['pinyin-numbered'] + ".mp3"
       });
       // console.log("https://cdn.yoyochinese.com/audio/pychart/"
       // + props.soundUrl + ".mp3");
       setSound(sound);
       //   console.log('Playing Sound');
       await sound.playAsync();
-  }
-  else {
+    }
+    else {
       const { sound } = await Audio.Sound.createAsync({
-          uri: "https://cdn.yoyochinese.com/audio/pychart/"
-              + setSoundUrl(hskData.words[randomNumbers[index]]['translation-data']['pinyin-numbered'])[0] + ".mp3"
+        uri: "https://cdn.yoyochinese.com/audio/pychart/"
+          + setSoundUrl(hskData.words[randomNumbers[index]]['translation-data']['pinyin-numbered'])[0] + ".mp3"
       });
 
       setSound(sound);
 
       await sound.playAsync().then(
-          setTimeout(async function () {
-              const { sound } = await Audio.Sound.createAsync({
-                  uri: "https://cdn.yoyochinese.com/audio/pychart/"
-                      + setSoundUrl(hskData.words[randomNumbers[index]]['translation-data']['pinyin-numbered'])[1] + ".mp3"
-              });
+        setTimeout(async function () {
+          const { sound } = await Audio.Sound.createAsync({
+            uri: "https://cdn.yoyochinese.com/audio/pychart/"
+              + setSoundUrl(hskData.words[randomNumbers[index]]['translation-data']['pinyin-numbered'])[1] + ".mp3"
+          });
 
-              setSound(sound);
-              await sound.playAsync()
+          setSound(sound);
+          await sound.playAsync()
 
-          }, 600)
+        }, 600)
       )
-  }
+    }
   }
 
   const onAnswer = (answer) => {
@@ -156,16 +157,18 @@ const Quiz = () => {
         SCORE: {score}</Text>
       {questions ? (
         <View style={(screenDimensions.width > 480) ? styles.questions : styles.questionsPhone}>
-          
-            <Text style={styles.questionsTitle}>
-              {questions.question}
-              <TouchableOpacity onPress={() =>
-            playPinyinSound()}>
-              <Ionicons name="volume-high" size={24} color="black" />
-             </TouchableOpacity>
-              meaning:
-            </Text>
-          
+
+          <Text style={styles.questionsTitle}>
+            {questions.question} /{questions.pinyin}/
+            <TouchableOpacity
+              onPress={() =>
+                playPinyinSound()}>
+              <Ionicons style={styles.iconicsTitle}
+                name="volume-high" size={24} color="black" />
+            </TouchableOpacity>
+            meaning:
+          </Text>
+
           {questions.answers && questions.answers.map((answer, index) => (
             <TouchableHighlight style={(screenDimensions.width > 480) ? styles.touchableHighlight
               : styles.touchableHighlightPhone} key={index} onPress={() => onAnswer(answer)}>
@@ -205,6 +208,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 25
+  },
+  iconicsTitle: {
+    marginTop: 8,
   },
   touchableHighlight: {
     backgroundColor: '#fff',
