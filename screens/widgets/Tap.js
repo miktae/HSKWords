@@ -88,10 +88,6 @@ const Tap = (props) => {
     }
 
     React.useEffect(() => {
-        hanzi.start();
-    }, [])
-
-    React.useEffect(() => {
         // console.log(setSoundUrl(props.soundUrl));
 
         return sound
@@ -109,6 +105,7 @@ const Tap = (props) => {
         // if (props.simplified) {
         //     console.log(props.simplified.length);
         // }
+        hanzi.start();
     }, [0])
 
     return (
