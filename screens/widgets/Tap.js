@@ -2,16 +2,14 @@ import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-nativ
 import React from 'react'
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
-import { useStore } from '../store.js';
 import hanzi from 'hanzi';
 
 const Tap = (props) => {
-    const setIndex = useStore(state => state.setIndex);
     const [textHanyuDetail, setTextHanyuDetail] = React.useState(null)
     const [textStyleIndex, setTextStyleIndex] = React.useState(null)
     const [textStyleIndex1, setTextStyleIndex1] = React.useState(null)
+    const [level, setLevel] = React.useState();
     const [sound, setSound] = React.useState();
-    const [pinyinSound, setPinyinSound] = React.useState();
 
     function setSoundUrl(url) {
         const soundUrlArr = [];
@@ -99,18 +97,28 @@ const Tap = (props) => {
     }, [sound]);
 
     React.useEffect(() => {
-        // if (textHanyuDetail)
-        //     console.log(hanzi.definitionLookup(textHanyuDetail).map((w, i) => w.definition));
-        // // console.log(typeof(props.simplified));
-        // if (props.simplified) {
-        //     console.log(props.simplified.length);
-        // }
         hanzi.start();
-    }, [0])
+    }, [textStyleIndex])
+
+    React.useEffect(() => {
+        if (props.index < 150) {
+            setLevel("A1")
+        }
+        else if (props.index < 300) {
+            setLevel("A2")
+        }
+        else if (props.index < 600) {
+            setLevel("B1")
+        }
+        else if (props.index < 1200) {
+            setLevel("B2")
+        }
+    }, [props.index])
 
     return (
         <View style={styles.container}>
             <View style={styles.tap}>
+                <Text style={styles.tapLevel}>{level}</Text>
                 <View style={styles.tapSimlified}>
                     {
                         props.tradional != props.simplified ?
@@ -134,6 +142,10 @@ const Tap = (props) => {
                                     </Text></Pressable>
                             </View>
                         ))}
+                        <sup style={props.count >= 3 ? { color: 'red' } : {}}>
+                            {props.count >= 3 ? 
+                        'Pro' : props.count }
+                        </sup>
                     </Text>
                 </View>
                 <View>
@@ -177,6 +189,7 @@ const Tap = (props) => {
                     </Text>
                 </TouchableOpacity>
                 <Text style={styles.tapMeaning}>{props.meaning}</Text>
+
             </View>
             {
                 (textStyleIndex != null)
@@ -249,13 +262,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#fafafa',
         margin: 9,
         paddingHorizontal: 50,
-        paddingVertical: 30,
+        paddingTop: 10,
+        paddingBottom: 30,
         textAlign: 'center',
         borderRadius: 6,
     },
     tapRow: {
         flexDirection: 'row',
         alignItems: 'center',
+    },
+    tapLevel: {
+        fontWeight: 600,
+    },
+    count: {
+        color: 'red'
     },
     tapHanyu: {
         fontSize: 26,

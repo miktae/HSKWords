@@ -20,6 +20,7 @@ export default function Home({ navigation }) {
   const addWords = useStore(state => state.pushToArray);
   const index = useStore(state => state.index);
   const isDarkMode = toggleDarkMode(state => state.isDarkMode);
+  const [wordCounts, setWordCounts] = useState({});
 
   useEffect(() => {
     generateRandomNumbers();  // generate initial set of numbers on mount
@@ -35,6 +36,12 @@ export default function Home({ navigation }) {
     if (randomNumbers) {
       addWords(randomNumbers)
       setIsLoading(false)
+      // Cập nhật số lần mỗi từ được random ra
+      const newWordCounts = { ...wordCounts };
+      randomNumbers.forEach(number => {
+        newWordCounts[number] = (newWordCounts[number] || 0) + 1;
+      });
+      setWordCounts(newWordCounts);
     }
   }, [randomNumbers]);
 
@@ -45,10 +52,13 @@ export default function Home({ navigation }) {
 
   const generateRandomNumbers = () => {
     const numbers = [];
-    for (let i = 0; i < 5; i++) {
-      const number = Math.floor(Math.random() * 600);
-      numbers.push(number);
+    for (let i = 0; i <= 3; i++) {
+      let n = Math.floor(Math.random() * 601)
+      numbers.push(n);
     }
+
+    let n = Math.floor(Math.random() * 601) + 600;
+    numbers.push(n);
     setRandomNumbers(numbers);
   };
 
@@ -89,6 +99,7 @@ export default function Home({ navigation }) {
                   pinyin={hskData.words[number]['translation-data'].pinyin}
                   soundUrl={hskData.words[number]['translation-data']['pinyin-numbered']}
                   meaning={hskData.words[number]['translation-data'].english}
+                  index={number}  count={wordCounts[number]} 
                   key={index} />
               ))
               }
