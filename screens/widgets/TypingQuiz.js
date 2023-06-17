@@ -64,9 +64,22 @@ const TypingQuiz = () => {
     }, []);
 
     useEffect(() => {
-        playPinyinSound()
+        setTimeout(playPinyinSound(), 300);
         fetchData(index);
     }, [index]);
+
+    useEffect(() => {
+        console.log(text);
+        if (text == questions.question) {
+            setText('')
+            setPlaceholder('Type your answer')
+            updateScore()
+            increaseQ()
+            playSound(true).then(() => {
+                fetchData(index + 1)
+            })
+        }
+    }, [text]);
 
     function setSoundUrl(url) {
         const soundUrlArr = [];
@@ -138,7 +151,6 @@ const TypingQuiz = () => {
         else {
             console.log('Incorrect')
             playSound(false)
-            
         }
     }
 
