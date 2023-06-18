@@ -18,7 +18,8 @@ export default function Home({ navigation }) {
   const refresh = useRefresh(state => state.refresh);
   const updateT = useStore(state => state.updateT);
   const addWords = useStore(state => state.pushToArray);
-  const index = useStore(state => state.index);
+  const clearQ = useStore(state => state.clearQ);
+  const killScore = useStore(state => state.killScore);
   const isDarkMode = toggleDarkMode(state => state.isDarkMode);
   const [wordCounts, setWordCounts] = useState({});
 
@@ -48,6 +49,8 @@ export default function Home({ navigation }) {
   useEffect(() => {
     // console.log(refresh);
     generateRandomNumbers();
+    killScore();
+    clearQ();
   }, [refresh]);
 
   const generateRandomNumbers = () => {

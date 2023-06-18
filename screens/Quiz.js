@@ -10,7 +10,7 @@ const Quiz = () => {
   const score = useStore(state => state.score);
   const killScore = useStore(state => state.killScore);
 
-  useEffect(() => { clearQ(); killScore(); }, [0])
+  useEffect(() => { }, [0])
 
   useEffect(() => { console.log('q: ', q) }, [q])
 
